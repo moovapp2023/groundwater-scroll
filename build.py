@@ -8,7 +8,7 @@ def group(s, gid):
         if a!=-1 and a<b: depth+=1; k=a+2
         else: depth-=1; k=b+4
     return s[i:k]
-def inner(g): 
+def inner(g):
     a=g.index('>')+1; return g[a:g.rindex('</g>')]
 def tag(s, eid):
     i=s.index('id="%s"'%eid); st=s.rfind('<',0,i); en=s.index('/>',i)+2; return s[st:en]
@@ -31,17 +31,22 @@ P4=attr(tag(f4,"Rectangle 41"),"d"); P55=attr(tag(f55,"Rectangle 41"),"d")
 P25=attr(tag(f25,"Rectangle 42"),"d")
 def nums(d): return [float(x) for x in re.findall(r'-?\d*\.?\d+(?:e-?\d+)?',d)]
 cmds=re.findall(r'[A-Za-z]',P4)
-# structure template: commands with counts
 tok=re.findall(r'([A-Za-z])|(-?\d*\.?\d+(?:e-?\d+)?)',P4)
-tmpl=[]; 
+tmpl=[];
 for c,n in tok:
     if c: tmpl.append([c,0])
     else: tmpl[-1][1]+=1
 n4=nums(P4); n55=nums(P55); assert len(n4)==len(n55)
-# 2.5 pose = affine of P4 into P25 bbox
-x0,x1=min(n4[0::2]),max(n4[0::2])   # NOTE: control points included; use bbox of real curve from earlier measure
+x0,x1=min(n4[0::2]),max(n4[0::2])
 data=dict(tmpl=tmpl,p4=n4,p55=n55,
   bbox4=[1454,2317.01,4290,3452.87],bbox25=[2406,1660,3631,2075.53])
+
+# --- Frame 6 / 7 bar chart content ---
+f6=rd("Frame_6_no_text"); f7b=rd("Frame_7_bar")
+f6_inner=inner(group(f6,"Frame 6 no text"))
+# strip white background rect
+f6_inner=re.sub(r'\s*<rect[^>]+fill="white"[^/]*/>\s*','\n',f6_inner,count=1).strip()
+f7_line=tag(f7b,"Line 88")
 
 html=open("template.html").read()
 rep={
@@ -50,6 +55,8 @@ rep={
 "%%R12%%":R12,"%%R33%%":R33,"%%R43%%":R43,"%%R45%%":R45,"%%V6%%":V6,
 "%%V4%%":V4,"%%V12%%":V12,"%%HATCH%%":hatch,
 "%%CURVEDATA%%":json.dumps(data),
+"%%F6BARS%%":f6_inner,
+"%%F7LINE%%":f7_line,
 }
 for k,v in rep.items(): html=html.replace(k,v)
 open("site/index.html","w").write(html)

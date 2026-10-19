@@ -128,16 +128,19 @@ applyCam();
 
 const total = tl.duration();
 
-/* ---------- step heights: keep same total scroll distance as original ---------- */
+/* ---------- step heights (called after both timelines are built) ---------- */
 function setStepHeights(){
-  const h = Math.ceil(innerHeight * (total * 0.55 + 1) / 6);
-  $$('.step').forEach(s => s.style.minHeight = h + 'px');
+  const h1 = Math.ceil(innerHeight * (total * 0.55 + 1) / 6);
+  $$('#story .step').forEach(s => s.style.minHeight = h1 + 'px');
+  if(typeof tl2 !== 'undefined'){
+    const h2 = Math.ceil(innerHeight * (tl2.duration() * 0.55 + 1) / 6);
+    $$('#story2 .step').forEach(s => s.style.minHeight = h2 + 'px');
+  }
 }
-setStepHeights();
 
-addEventListener('resize', ()=>{ setStepHeights(); applyCam(); ScrollTrigger.refresh(); });
+addEventListener('resize', ()=>{ setStepHeights(); applyCam(); applyCam2(); ScrollTrigger.refresh(); });
 
-/* ---------- ScrollTrigger: story section drives the timeline ---------- */
+/* ---------- ScrollTrigger: story 1 ---------- */
 const st = ScrollTrigger.create({
   trigger: '#story',
   start: 'top top',
@@ -146,4 +149,96 @@ const st = ScrollTrigger.create({
   animation: tl,
   invalidateOnRefresh: true
 });
-window.__tl=tl; window.__st=st; window.__total=total;
+
+/* ==================== STORY 2: FRAME 6 / 7 BAR CHARTS ==================== */
+
+const stage2 = document.getElementById('stage2');
+const world2 = document.getElementById('world2');
+
+/* ---------- camera 2 ---------- */
+const cam2 = {cx:3073, cy:3035, w:1700, h:3600};
+function applyCam2(){
+  if(!stage2) return;
+  const vw=stage2.clientWidth, vh=stage2.clientHeight;
+  const s=Math.min(vw/cam2.w, vh/cam2.h);
+  world2.style.transform=`translate(${vw/2-cam2.cx*s}px,${vh/2-cam2.cy*s}px) scale(${s})`;
+}
+applyCam2();
+
+/* ---------- morph data: [id, f6x, f6y, f6w, f6h, f7x, f7y, f7w, f7h] ---------- */
+const MORPH = [
+  ["Rectangle 83",3289.0,1883.8,22.8,2505.2,1160,3327,192,890],
+  ["Rectangle 84",3311.0,1893.4,22.1,2495.6,1343,3371,193,846],
+  ["Rectangle 85",3332.3,1892.2,22.1,2496.8,1526,3301,193,916],
+  ["Rectangle 86",3353.6,1910.2,22.8,2478.8,1709,3610,193,607],
+  ["Rectangle 87",3374.8,1897.0,22.1,2492.0,1893,3584,192,633],
+  ["Rectangle 88",3396.1,1876.6,22.8,2512.4,2076,3262,192,955],
+  ["Rectangle 89",3418.1,1927.0,22.1,2462.0,2260,3161,193,1056],
+  ["Rectangle 90",3438.6,1947.4,22.8,2441.6,2443,3120,193,1097],
+  ["Rectangle 91",3460.7,1967.8,22.1,2421.2,2627,3423,192,794],
+  ["Rectangle 92",3481.9,1899.4,22.8,2489.6,2812,3599,193,618],
+  ["Rectangle 93",3503.2,1903.0,22.1,2486.0,2996,3217,192,1000],
+  ["Rectangle 94",3525.3,1948.6,22.1,2440.4,3183,3037,192,1180],
+  ["Rectangle 95",3546.5,1954.6,22.8,2434.4,3370,2852,192,1365],
+  ["Rectangle 96",3567.0,1939.0,22.8,2450.0,3553,2711,193,1506],
+  ["Rectangle 97",3589.1,1924.6,22.1,2464.4,3738,3099,192,1118],
+  ["Rectangle 98",3611.1,1897.0,22.1,2492.0,3921,3599,192,618],
+  ["Rectangle 99",3631.6,1863.4,22.8,2525.6,4108,3336,192,881],
+  ["Rectangle 100",3652.9,1888.6,22.8,2500.4,4291,3599,193,618],
+  ["Rectangle 101",3674.9,1876.6,22.1,2512.4,4474,3245,193,972]
+];
+const NON_TRANS_RED = ["Rectangle 44","Rectangle 45","Rectangle 46","Rectangle 47","Rectangle 49","Rectangle 48","Rectangle 50","Rectangle 51","Rectangle 52","Rectangle 53","Rectangle 54","Rectangle 56","Rectangle 57","Rectangle 58","Rectangle 59","Rectangle 60","Rectangle 61","Rectangle 62","Rectangle 63","Rectangle 64","Rectangle 65","Rectangle 66","Rectangle 67","Rectangle 68","Rectangle 69","Rectangle 70","Rectangle 71","Rectangle 72","Rectangle 73","Rectangle 74","Rectangle 75","Rectangle 76","Rectangle 77","Rectangle 78","Rectangle 79","Rectangle 80","Rectangle 81","Rectangle 82","Rectangle 55"];
+const BLUE_IDS = ["Rectangle 145","Rectangle 102","Rectangle 103","Rectangle 104","Rectangle 105","Rectangle 106","Rectangle 108","Rectangle 107","Rectangle 109","Rectangle 110","Rectangle 111","Rectangle 112","Rectangle 113","Rectangle 115","Rectangle 116","Rectangle 117","Rectangle 118","Rectangle 119","Rectangle 120","Rectangle 121","Rectangle 122","Rectangle 123","Rectangle 124","Rectangle 125","Rectangle 126","Rectangle 127","Rectangle 128","Rectangle 129","Rectangle 130","Rectangle 131","Rectangle 132","Rectangle 133","Rectangle 134","Rectangle 135","Rectangle 136","Rectangle 137","Rectangle 138","Rectangle 139","Rectangle 140","Rectangle 141","Rectangle 142","Rectangle 143","Rectangle 144","Rectangle 146","Rectangle 147","Rectangle 148","Rectangle 149","Rectangle 150","Rectangle 151","Rectangle 152","Rectangle 153","Rectangle 154","Rectangle 155","Rectangle 114"];
+
+/* scope lookups to svg2 to avoid ID conflicts with story 1 */
+const svg2 = stage2 ? stage2.querySelector('svg') : null;
+function EL2(id){ return svg2 ? svg2.querySelector(`[id="${id}"]`) : null; }
+
+const nonTransEls = NON_TRANS_RED.map(EL2).filter(Boolean);
+const blueEls = BLUE_IDS.map(EL2).filter(Boolean);
+const outline2 = EL2('Rectangle 367');
+const f7r104 = document.getElementById('f7r104');
+const f7r105 = document.getElementById('f7r105');
+const f7dotline = document.getElementById('f7dotline');
+
+/* ---------- timeline 2 ---------- */
+const tl2 = gsap.timeline({defaults:{ease:'power2.inOut'}, onUpdate:applyCam2});
+const cam2To = (c,at,d=2)=> tl2.to(cam2,{...c,duration:d},at);
+const fade2 = (t,at,v=1,d=.6)=> tl2.to(t,{opacity:v,duration:d,ease:'none'},at);
+tl2.set(cam2,{...cam2},0);
+
+/* S7: Frame 6 hold */
+cam2To({cx:3073,cy:3035,w:1700,h:3600}, 0.1, 1.8);
+tl2.to({},{duration:3},2);  // hold on Frame 6
+
+/* S8: outline + non-transition bars fade, morph begins */
+const rect160 = EL2('Rectangle 160');
+const fadeOuts2 = [...nonTransEls,...blueEls,outline2,rect160].filter(Boolean);
+fade2(fadeOuts2, 5, 0, 1.8);
+cam2To({cx:3200,cy:3300,w:4600,h:2600}, 5, 3.5);
+MORPH.forEach((m,i)=>{
+  const el = EL2(m[0]);
+  if(!el) return;
+  tl2.to(el,{attr:{x:m[5],y:m[6],width:m[7],height:m[8]},duration:2.5,ease:'power2.inOut'},5.5+i*0.04);
+});
+/* 2021-2022 bars grow in from baseline */
+tl2.fromTo(f7r104,{attr:{height:0,y:4217}},{attr:{height:1269,y:2948},duration:1,ease:'power2.out'},8.2);
+tl2.fromTo(f7r105,{attr:{height:0,y:4217}},{attr:{height:1350,y:2867},duration:1,ease:'power2.out'},8.5);
+fade2(f7dotline, 9.2, 1, 0.8);
+
+/* placeholder for S9-S12 */
+tl2.to({},{duration:15},10.5);
+
+/* ---------- ScrollTrigger: story 2 ---------- */
+let tl2Total = tl2.duration();
+const st2 = ScrollTrigger.create({
+  trigger: '#story2',
+  start: 'top top',
+  end: () => '+=' + Math.round(innerHeight * (reduce ? 0.01 : tl2Total * 0.55)),
+  scrub: reduce ? true : 0.7,
+  animation: tl2,
+  invalidateOnRefresh: true
+});
+
+setStepHeights();
+window.__tl=tl; window.__tl2=tl2; window.__st=st; window.__st2=st2; window.__total=total;

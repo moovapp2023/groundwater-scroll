@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 build.py)",
+      "Bash(firecrawl *)",
+      "Bash(node --check *)",
+      "Bash(open -a *)",
+      "mcp__f76892f7-287c-4a95-86c0-bdacc37dc0c6__search_files",
+      "mcp__f76892f7-287c-4a95-86c0-bdacc37dc0c6__read_file_content",
+      "mcp__f76892f7-287c-4a95-86c0-bdacc37dc0c6__get_file_metadata",
+      "mcp__f76892f7-287c-4a95-86c0-bdacc37dc0c6__list_recent_files"
+    ]
+  }
+}
