@@ -44,9 +44,19 @@ data=dict(tmpl=tmpl,p4=n4,p55=n55,
 # --- Frame 6 / 7 bar chart content ---
 f6=rd("Frame_6_no_text"); f7b=rd("Frame_7_bar")
 f6_inner=inner(group(f6,"Frame 6 no text"))
-# strip white background rect
 f6_inner=re.sub(r'\s*<rect[^>]+fill="white"[^/]*/>\s*','\n',f6_inner,count=1).strip()
 f7_line=tag(f7b,"Line 88")
+
+# --- Frame 8 dry-well bars (aligned with Frame 7 timeline) ---
+f8=rd("Frame_8_graph_aligned_with_frame_7_graph_importnat_bc_timeline")
+f8_all=inner(group(f8,"Group 31"))
+f8_bars='\n'.join(l for l in f8_all.split('\n') if 'fill="black"' in l)
+f8_lines='\n'.join(l for l in f8_all.split('\n') if 'stroke="black"' in l)
+
+# --- Frame 10 colored dry-well bars ---
+f10lb=rd("Frame_10_label_bars_and_boxes")
+f10_inner=inner(group(f10lb,"Frame 10 label bars and boxes"))
+f10_inner=re.sub(r'\s*<rect[^>]+fill="white"[^/]*/>\s*','\n',f10_inner,count=1).strip()
 
 html=open("template.html").read()
 rep={
@@ -57,6 +67,9 @@ rep={
 "%%CURVEDATA%%":json.dumps(data),
 "%%F6BARS%%":f6_inner,
 "%%F7LINE%%":f7_line,
+"%%F8BARS%%":f8_bars,
+"%%F8LINES%%":f8_lines,
+"%%F10BARS%%":f10_inner,
 }
 for k,v in rep.items(): html=html.replace(k,v)
 open("site/index.html","w").write(html)

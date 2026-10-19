@@ -162,6 +162,7 @@ function applyCam2(){
   const vw=stage2.clientWidth, vh=stage2.clientHeight;
   const s=Math.min(vw/cam2.w, vh/cam2.h);
   world2.style.transform=`translate(${vw/2-cam2.cx*s}px,${vh/2-cam2.cy*s}px) scale(${s})`;
+  for(const e of labels2.children){ const fs=+e.dataset.fs, mn=+e.dataset.min; e.style.fontSize=Math.max(fs,mn/s)+'px'; }
 }
 applyCam2();
 
@@ -194,6 +195,39 @@ const BLUE_IDS = ["Rectangle 145","Rectangle 102","Rectangle 103","Rectangle 104
 const svg2 = stage2 ? stage2.querySelector('svg') : null;
 function EL2(id){ return svg2 ? svg2.querySelector(`[id="${id}"]`) : null; }
 
+/* ---------- story2 labels ---------- */
+const LAB2 = [
+  {id:'t2Cities', txt:'Cities',                        k:'arch blue',  fs:200, x:2570, y:1500, c:1},
+  {id:'t2Agri',   txt:'Agriculture',                   k:'arch',       fs:200, x:3072, y:3900, c:1, col:'#fff'},
+  {id:'t21960',   txt:'1960',                          k:'sans',       fs:180, x:2440, y:4490},
+  {id:'t22020',   txt:'2020',                          k:'sans',       fs:180, x:3705, y:4490, c:1},
+  {id:'t2TFW',    txt:'Total farm water usage (100%)', k:'mono blue',  fs:110, x:1185, y:2025},
+  {id:'t2GW',     txt:'Groundwater  %',                k:'arch',       fs:200, x:1650, y:3950, col:'#fff'},
+  {id:'t22002',   txt:'2002',                          k:'sans',       fs:180, x:1160, y:4360},
+  {id:'t22022',   txt:'2022',                          k:'sans',       fs:180, x:4900, y:4360, c:1},
+  {id:'t270pct',  txt:'70%',                           k:'arch',       fs:200, x:3580, y:2530, c:1, col:'#FB5D5D'},
+  {id:'t2DPk',    txt:'DROUGHT\nPEAKS',               k:'arch',       fs:130, x:3750, y:4460, c:1, lh:.85, col:'#FB5D5D'},
+  {id:'t2FGW',    txt:'FARM\nGROUNDWATER',            k:'arch',       fs:180, x:1170, y:3200, lh:.85, col:'#FB5D5D'},
+  {id:'t2DryW',   txt:'REPORTED DRY WELLS',           k:'arch',       fs:170, x:4050, y:4480, c:1},
+  {id:'t2Ax250',  txt:'·250',                    k:'sans',       fs:140, x:6080, y:2250},
+  {id:'t2Ax150',  txt:'·150',                    k:'sans',       fs:140, x:6080, y:3010},
+  {id:'t2Ax50',   txt:'·50',                     k:'sans',       fs:140, x:6080, y:3770},
+  {id:'t22012',   txt:'2012',                          k:'sans',       fs:180, x:2996, y:4370},
+  {id:'t22026',   txt:'2026',                          k:'sans',       fs:180, x:5750, y:4370, c:1},
+];
+const labels2 = document.getElementById('labels2');
+const POS2 = {};
+LAB2.forEach(L=>{
+  const e=document.createElement('div'); e.className='t '+L.k; e.id=L.id;
+  e.textContent=L.txt;
+  if(L.lh) e.style.lineHeight=L.lh;
+  if(L.col) e.style.color=L.col;
+  e.dataset.fs=L.fs; e.dataset.min=L.min||13;
+  labels2.appendChild(e);
+  POS2[L.id]={x:L.x, y:L.y-0.14*L.fs};
+  gsap.set(e,{x:POS2[L.id].x, y:POS2[L.id].y, xPercent:L.c?-50:0});
+});
+
 const nonTransEls = NON_TRANS_RED.map(EL2).filter(Boolean);
 const blueEls = BLUE_IDS.map(EL2).filter(Boolean);
 const outline2 = EL2('Rectangle 367');
@@ -210,10 +244,14 @@ tl2.set(cam2,{...cam2},0);
 /* S7: Frame 6 hold */
 cam2To({cx:3073,cy:3035,w:1700,h:3600}, 0.1, 1.8);
 tl2.to({},{duration:3},2);  // hold on Frame 6
+fade2([document.getElementById('t2Cities'),document.getElementById('t2Agri'),
+       document.getElementById('t21960'),document.getElementById('t22020')], 1.5, 1, 0.7);
 
 /* S8: outline + non-transition bars fade, morph begins */
 const rect160 = EL2('Rectangle 160');
 const fadeOuts2 = [...nonTransEls,...blueEls,outline2,rect160].filter(Boolean);
+fade2([document.getElementById('t2Cities'),document.getElementById('t2Agri'),
+       document.getElementById('t21960'),document.getElementById('t22020')], 5, 0, 0.6);
 fade2(fadeOuts2, 5, 0, 1.8);
 cam2To({cx:3200,cy:3300,w:4600,h:2600}, 5, 3.5);
 MORPH.forEach((m,i)=>{
@@ -221,13 +259,45 @@ MORPH.forEach((m,i)=>{
   if(!el) return;
   tl2.to(el,{attr:{x:m[5],y:m[6],width:m[7],height:m[8]},duration:2.5,ease:'power2.inOut'},5.5+i*0.04);
 });
-/* 2021-2022 bars grow in from baseline */
+/* 2021-2022 bars grow in — must make visible first */
+tl2.set([f7r104,f7r105],{opacity:1},8.0);
 tl2.fromTo(f7r104,{attr:{height:0,y:4217}},{attr:{height:1269,y:2948},duration:1,ease:'power2.out'},8.2);
 tl2.fromTo(f7r105,{attr:{height:0,y:4217}},{attr:{height:1350,y:2867},duration:1,ease:'power2.out'},8.5);
 fade2(f7dotline, 9.2, 1, 0.8);
+fade2([document.getElementById('t2TFW'),document.getElementById('t2GW'),
+       document.getElementById('t22002'),document.getElementById('t22022')], 9.5, 1, 0.8);
 
-/* placeholder for S9-S12 */
-tl2.to({},{duration:15},10.5);
+/* S9: Frame 8 dry-well bars + axes appear over Frame 7 */
+const f8bars = document.getElementById('f8bars');
+const f8lines = document.getElementById('f8lines');
+fade2([f8bars,f8lines], 11.5, 1, 1.5);
+cam2To({cx:3300,cy:3200,w:4800,h:2800}, 11.5, 2);
+
+/* S10: 70% + DROUGHT PEAKS annotation */
+const f8arrow = document.getElementById('f8arrow');
+fade2(document.getElementById('t270pct'), 17.5, 1, 0.6);
+fade2([f8arrow,document.getElementById('t2DPk')], 17.8, 1, 0.7);
+
+/* S11: camera shifts to Frame 9 pose — zoomed to 2012+ with axes */
+fade2([document.getElementById('t2TFW'),document.getElementById('t22002'),
+       document.getElementById('t22022')], 22, 0, 0.5);
+cam2To({cx:4600,cy:3200,w:3400,h:2700}, 22.5, 2.5);
+fade2([document.getElementById('t2FGW'),document.getElementById('t2DryW')], 24, 1, 0.8);
+fade2([document.getElementById('t2Ax250'),document.getElementById('t2Ax150'),
+       document.getElementById('t2Ax50')], 24.5, 1, 0.6);
+fade2([document.getElementById('t22012'),document.getElementById('t22026')], 24, 1, 0.6);
+
+/* S12: Frame 10 colored bars — fade out black bars, fade in colored */
+const f10wrap = document.getElementById('f10wrap');
+fade2([f8bars,f8lines,f8arrow,f7dotline,
+       document.getElementById('t270pct'),document.getElementById('t2DPk'),
+       document.getElementById('t2FGW'),document.getElementById('t2DryW'),
+       document.getElementById('t2Ax250'),document.getElementById('t2Ax150'),
+       document.getElementById('t2Ax50'),document.getElementById('t22012'),
+       document.getElementById('t22026')], 30, 0, 1.2);
+cam2To({cx:2900,cy:3800,w:5000,h:2800}, 30, 2.5);
+fade2(f10wrap, 31.5, 1, 1.5);
+tl2.to({},{duration:2},34);
 
 /* ---------- ScrollTrigger: story 2 ---------- */
 let tl2Total = tl2.duration();
