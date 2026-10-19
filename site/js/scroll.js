@@ -154,6 +154,7 @@ const st = ScrollTrigger.create({
 
 const stage2 = document.getElementById('stage2');
 const world2 = document.getElementById('world2');
+const labels2 = document.getElementById('labels2');
 
 /* ---------- camera 2 ---------- */
 const cam2 = {cx:3073, cy:3035, w:1700, h:3600};
@@ -215,7 +216,6 @@ const LAB2 = [
   {id:'t22012',   txt:'2012',                          k:'sans',       fs:180, x:2996, y:4370},
   {id:'t22026',   txt:'2026',                          k:'sans',       fs:180, x:5750, y:4370, c:1},
 ];
-const labels2 = document.getElementById('labels2');
 const POS2 = {};
 LAB2.forEach(L=>{
   const e=document.createElement('div'); e.className='t '+L.k; e.id=L.id;
