@@ -1,0 +1,149 @@
+gsap.registerPlugin(ScrollTrigger);
+const CD = JSON.parse(document.getElementById('curvedata').textContent);
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+const stage = $('#stage'), world = $('#world');
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ---------- curve: one path, three poses ---------- */
+const [bx0,by0,bx1,by1] = CD.bbox4, [cx0,cy0,cx1,cy1] = CD.bbox25;
+const sx = (cx1-cx0)/(bx1-bx0), sy = (cy1-cy0)/(by1-by0);
+const pose4 = CD.p4, pose55 = CD.p55;
+const pose25 = pose4.map((v,i)=> i%2===0 ? cx0+(v-bx0)*sx : cy0+(v-by0)*sy);
+function dFrom(n){ let i=0, o=''; for(const [c,k] of CD.tmpl){ o+=c; for(let j=0;j<k;j++){ o+=(+n[i++].toFixed(2))+(j<k-1?' ':''); } } return o; }
+const curve = $('#curve'), curveState = {t:0, draw:0};
+function paintCurve(){
+  const t = curveState.t; let a,b,u,sw;
+  if(t<=1){ a=pose25; b=pose4; u=t; sw=35+(90-35)*u; } else { a=pose4; b=pose55; u=t-1; sw=90; }
+  const n = a.map((v,i)=> v+(b[i]-v)*u);
+  curve.setAttribute('d', dFrom(n)); curve.setAttribute('stroke-width', sw);
+  curve.style.strokeDasharray = '1 1'; curve.style.strokeDashoffset = 1-curveState.draw;
+}
+paintCurve();
+
+/* ---------- labels ---------- */
+const LAB = [
+ {id:'t860',  txt:'860 km3', k:'sans', fs:205, x:3654, y:1434},
+ {id:'tAgo',  txt:'← 30,000 years ago', k:'sans', fs:205, x:69, y:4467},
+ {id:'t1960', txt:'1960', k:'sans', fs:205, x:3663, y:4467, c:1},
+ {id:'t2020', txt:'2020', k:'sans', fs:205, x:3502, y:4467, c:1},
+ {id:'t202',  txt:'202 years\nleft', k:'mono', fs:209, x:4605, y:2460, lh:.79},
+ {id:'tLess', txt:'less usable &\nharder to get', k:'mono blue', fs:135, x:4011, y:2250, lh:.85},
+ {id:'tHead', txt:'THIS MUCH IS\nGONE FOREVER', k:'arch', fs:165, x:2669, y:1971, lh:.89, min:15},
+ {id:'tNever',txt:'NEVER\nCOMING\nBACK PART', k:'arch', fs:150, x:3603, y:1872, lh:.8, min:15},
+ {id:'tFuture',txt:'FUTURE,\nPROBABLY', k:'arch', fs:150, x:4101, y:4188, lh:.78, c:1, ta:'center', min:15},
+ {id:'tWhere',txt:'where did this go?', k:'sans', fs:200, x:2420, y:1950, c:1, min:17},
+];
+const BAR4 = [[2122,2662,306],[2840,2949,306],[3349,2910,306],[3646,3100,330],[3897,3370,330],[4233,3515,427]];
+const BAR5 = [[1796,2585,295],[2369,2828,330],[2775,2712,329],[3011,2844,368],[3211,3163,263],[3478,3278,342]];
+const PILE = [[3694,3568],[3750,3615],[3792,3650],[3830,3689],[3859,3717],[3884,3743]];
+BAR4.forEach((b,i)=>LAB.push({id:'dr'+i, txt:'Drought', k:'arch', fs:102, x:b[0]+5, y:b[1]+b[2]+40, c:1, min:11}));
+PILE.forEach((p,i)=>LAB.push({id:'pile'+i, txt:'Drought', k:'arch', fs:102, x:p[0], y:p[1], min:11}));
+const labels = $('#labels'); const POS={};
+LAB.forEach(L=>{
+  const e=document.createElement('div'); e.className='t '+L.k; e.id=L.id; e.textContent=L.txt;
+  if(L.lh) e.style.lineHeight=L.lh; if(L.ta) e.style.textAlign=L.ta; e.dataset.fs=L.fs; e.dataset.min=L.min||13;
+  labels.appendChild(e);
+  POS[L.id]={x:L.x,y:L.y-0.14*L.fs}; gsap.set(e,{x:POS[L.id].x, y:POS[L.id].y, xPercent:L.c?-50:0});
+});
+const EL = id => document.getElementById(id);
+
+/* ---------- camera ---------- */
+const cam = {cx:2300, cy:3050, w:4800, h:3900};
+let curScale = 1;
+const FULL = location.search.includes('full');
+function applyCam(){
+  const vw=stage.clientWidth, vh=stage.clientHeight;
+  const C = FULL?{cx:3067.5,cy:2720,w:6135,h:5440}:cam;
+  const s = Math.min(vw/C.w, vh/C.h); curScale=s;
+  world.style.transform = `translate(${vw/2-C.cx*s}px,${vh/2-C.cy*s}px) scale(${s})`;
+  for(const e of labels.children){ const fs=+e.dataset.fs, mn=+e.dataset.min; e.style.fontSize = Math.max(fs, mn/s)+'px'; }
+}
+
+/* ---------- timeline ---------- */
+const tl = gsap.timeline({defaults:{ease:'power2.inOut'}, onUpdate:applyCam});
+const camTo = (c,at,d=2)=> tl.to(cam,{...c,duration:d},at);
+const fade = (t,at,v=1,d=.6)=> tl.to(t,{opacity:v,duration:d,ease:'none'},at);
+const bars = $$('.bar');
+
+gsap.set(['#blockParts','#band2','#band4','#wedge','#dashArrow2'],{opacity:0});
+gsap.set('#hatchWrap',{opacity:1});
+fade(EL('t860'),0.1,1,.01); fade(EL('tAgo'),0.1,1,.01); fade(EL('t1960'),0.1,1,.01);
+tl.set(cam,{...cam},0);
+
+/* S1 -> S2 */
+tl.to('#blockFlat',{attr:{x:2407,width:1238},duration:2,ease:'power2.inOut'},1);
+fade([EL('tAgo'),EL('t860'),'#leader860'],1,0,.7);
+tl.to(EL('t1960'),{x:2526,duration:2},1);
+camTo({cx:3950,cy:3150,w:3900,h:3500},1,2.4);
+tl.set('#blockParts',{opacity:1},3.05); tl.set('#blockFlat',{opacity:0},3.05);
+fade('#flatTop',3.4,0,.8);
+tl.to(curveState,{draw:1,duration:1.4,ease:'none',onUpdate:paintCurve},3.0);
+fade(EL('t2020'),3.2,1,.6);
+fade('#band2',3.7,1,.6);
+fade(EL('t202'),4.2,1,.6);
+tl.set('#dashArrow2',{opacity:1},4.3);
+tl.to('#dashClipRect',{attr:{width:900},duration:1.0,ease:'none'},4.3);
+
+/* S3: gradient + "less usable" */
+fade('#gradLayer',6,1,1.2); fade('#gradSide',6.6,1,.8);
+fade([EL('t202'),'#dashArrow2',EL('t1960'),EL('t2020')],6,0,.6);
+tl.fromTo(EL('tLess'),{opacity:0,xPercent:12},{opacity:1,xPercent:0,duration:.9,ease:'power2.out'},7);
+
+/* S4: curve centered, bigger; block disappears; labels fly in */
+fade(['#gradLayer','#gradSide','#blockParts',EL('tLess')],9,0,1);
+tl.to(curveState,{t:1,duration:2.2,ease:'power2.inOut',onUpdate:paintCurve},9);
+fade('#band2',9,0,.8); fade('#band4',10,1,1);
+camTo({cx:2950,cy:3050,w:3500,h:2950},9,2.2);
+fade('#bars',11,1,.1);
+tl.fromTo(bars,{scaleY:0,transformOrigin:'50% 0%'},{scaleY:1,duration:.9,stagger:.12,ease:'power2.out'},11);
+fade(EL('tHead'),11.2,1,.8);
+for(let i=0;i<6;i++){ const P=POS['dr'+i]; tl.fromTo(EL('dr'+i),{opacity:0,y:P.y+40},{opacity:1,y:P.y,duration:.5,ease:'power2.out'},11.6+i*.12); }
+
+/* S5: curve shrinks left, wedge + arrow + pile labels */
+const kx=0.7915, tx=1275-1454*kx, ky=0.75, ty=2287-2285*ky;
+fade(EL('tHead'),14,0,.6);
+tl.to(curveState,{t:2,duration:2,ease:'power2.inOut',onUpdate:paintCurve},14);
+tl.to('#band4',{x:tx,y:ty,scaleX:kx,scaleY:ky,svgOrigin:'0 0',duration:2},14);
+camTo({cx:2950,cy:3150,w:3700,h:3050},14,2);
+bars.forEach((b,i)=>{ const p=BAR5[i]; tl.to(b,{attr:{x:p[0],y:p[1],height:p[2]},duration:2},14); });
+for(let i=0;i<6;i++){ const p=BAR5[i]; tl.to(EL('dr'+i),{x:p[0]+5,y:p[1]+p[2]+20-0.14*102,duration:2},14); }
+tl.fromTo('#wedge',{opacity:0,x:500},{opacity:1,x:0,duration:1.2,ease:'power2.out'},16);
+fade('#arrow5',16.8,1,.1);
+tl.to('#arrowClipRect',{attr:{width:900},duration:1.1,ease:'none'},16.8);
+fade(EL('tNever'),16.6,1,.8);
+for(let i=0;i<6;i++){ const P=POS['pile'+i]; tl.fromTo(EL('pile'+i),{opacity:0,x:P.x-160,y:P.y-80},{opacity:1,x:P.x,y:P.y,duration:.5,ease:'power2.out'},17.6+i*.15); }
+fade(EL('tFuture'),18.4,1,.8);
+
+/* S5.5: clear stage, hatch fades up */
+fade(['#band4','#wedge','#arrow5','#bars',EL('tNever'),EL('tFuture')].concat(
+  Array.from({length:6},(_,i)=>EL('dr'+i)),
+  Array.from({length:6},(_,i)=>EL('pile'+i))
+),20.5,0,.9);
+camTo({cx:2420,cy:2800,w:3000,h:2700},20.5,2);
+tl.to('#hatchClipRect',{attr:{y:2200,height:1100},duration:2.2,ease:'power1.inOut'},21.8);
+fade(EL('tWhere'),23.2,1,.8);
+tl.to({},{duration:1.2},24.2);
+
+applyCam();
+
+const total = tl.duration();
+
+/* ---------- step heights: keep same total scroll distance as original ---------- */
+function setStepHeights(){
+  const h = Math.ceil(innerHeight * (total * 0.55 + 1) / 6);
+  $$('.step').forEach(s => s.style.minHeight = h + 'px');
+}
+setStepHeights();
+
+addEventListener('resize', ()=>{ setStepHeights(); applyCam(); ScrollTrigger.refresh(); });
+
+/* ---------- ScrollTrigger: story section drives the timeline ---------- */
+const st = ScrollTrigger.create({
+  trigger: '#story',
+  start: 'top top',
+  end: () => '+=' + Math.round(innerHeight * (reduce ? 0.01 : total * 0.55)),
+  scrub: reduce ? true : 0.7,
+  animation: tl,
+  invalidateOnRefresh: true
+});
+window.__tl=tl; window.__st=st; window.__total=total;
