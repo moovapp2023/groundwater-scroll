@@ -1,0 +1,45 @@
+<svg width="6135" height="5440" viewBox="0 0 6135 5440" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="Frame 5.5 bis no text">
+<rect width="6135" height="5440" fill="white"/>
+<g id="Rectangle 12" filter="url(#filter0_n_11_7906)">
+<path d="M3537 3056.28L3468.53 3157.39L3368.18 2998.35L3220.6 3109.26L3080.11 2821.92L3012.82 2909.48L2919.16 2714.75L2812.12 2785.72L2590.96 2622.74L2403.25 2785.72L2162.41 2496.36L2061.66 2396.27L1822.01 2583.31L1740.15 2440.07L1559.52 2352.18L1472.16 2420.53L1358.43 2352.18H1311.6L1276.57 2281H3537V3056.28Z" fill="url(#pattern0_11_7906)"/>
+</g>
+</g>
+<defs>
+<filter id="filter0_n_11_7906" x="1276.57" y="2281.01" width="2260.43" height="876.383" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feTurbulence type="fractalNoise" baseFrequency="0.18867923319339752 0.18867923319339752" stitchTiles="stitch" numOctaves="3" result="noise" seed="1064" />
+<feColorMatrix in="noise" type="luminanceToAlpha" result="alphaNoise" />
+<feComponentTransfer in="alphaNoise" result="coloredNoise1">
+<feFuncA type="discrete" tableValues="1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 "/>
+</feComponentTransfer>
+<feComposite operator="in" in2="shape" in="coloredNoise1" result="noise1Clipped" />
+<feFlood flood-color="#E24B4A" result="color1Flood" />
+<feComposite operator="in" in2="noise1Clipped" in="color1Flood" result="color1" />
+<feMerge result="effect1_noise_11_7906">
+<feMergeNode in="shape" />
+<feMergeNode in="color1" />
+</feMerge>
+</filter>
+<pattern id="pattern0_11_7906" patternUnits="userSpaceOnUse" patternTransform="matrix(-143.975 0 0 -788.45 3537 3157.39)" preserveAspectRatio="none" viewBox="1.22075e-05 0 221.5 1213" width="1" height="1">
+<use xlink:href="#pattern0_11_7906_inner" transform="translate(-664.5 -1213)"/>
+<use xlink:href="#pattern0_11_7906_inner" transform="translate(-443 -1213)"/>
+<use xlink:href="#pattern0_11_7906_inner" transform="translate(-221.5 -1213)"/>
+<use xlink:href="#pattern0_11_7906_inner" transform="translate(0 -1213)"/>
+<use xlink:href="#pattern0_11_7906_inner" transform="translate(-553.75 -606.5)"/>
+<use xlink:href="#pattern0_11_7906_inner" transform="translate(-332.25 -606.5)"/>
+<use xlink:href="#pattern0_11_7906_inner" transform="translate(-110.75 -606.5)"/>
+<use xlink:href="#pattern0_11_7906_inner" transform="translate(110.75 -606.5)"/>
+<use xlink:href="#pattern0_11_7906_inner" transform="translate(-664.5 0)"/>
+<use xlink:href="#pattern0_11_7906_inner" transform="translate(-443 0)"/>
+<use xlink:href="#pattern0_11_7906_inner" transform="translate(-221.5 0)"/>
+<g id="pattern0_11_7906_inner">
+<path id="Line 92" d="M445.048 1.43401L443 0L0 1213L2.04783 1214.43L4.09567 1215.87L447.096 2.86801L445.048 1.43401Z" fill="black"/>
+</g>
+<use xlink:href="#pattern0_11_7906_inner" transform="translate(-553.75 606.5)"/>
+<use xlink:href="#pattern0_11_7906_inner" transform="translate(-332.25 606.5)"/>
+<use xlink:href="#pattern0_11_7906_inner" transform="translate(-110.75 606.5)"/>
+<use xlink:href="#pattern0_11_7906_inner" transform="translate(110.75 606.5)"/>
+</pattern></defs>
+</svg>
